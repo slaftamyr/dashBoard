@@ -1,0 +1,18 @@
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+* {
+  box-sizing: border-box;
+}
+
+.MuiPaper-root,
+.MuiButton-root {
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
