@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 import {
   Card,
@@ -11,41 +11,30 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
 } from "@mui/material";
 import FilterBar from "../components/FilterBar.jsx";
 import StatCard from "../components/StatCard.jsx";
 import { getCustomers } from "../services/api.js";
+import { useFilters } from "../context/FiltersContext.jsx";
 
 export default function Customers() {
-  const [filters, setFilters] = useState({
-    range: "12m",
-    category: "all",
-    q: "",
-  });
+  const { filters } = useFilters();
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
     let mounted = true;
-    getCustomers().then((c) => mounted && setRows(c));
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    getCustomers(filters).then((c) => mounted && setRows(c));
+    return () => { mounted = false; };
+  }, [filters]);
 
-  const filtered = useMemo(() => {
-    return rows.filter(
-      (r) =>
-        !filters.q || r.name.toLowerCase().includes(filters.q.toLowerCase())
-    );
-  }, [rows, filters]);
+  const filtered = rows;
 
   const total = filtered.length;
   const repeat = filtered.filter((r) => r.repeat).length;
 
   return (
     <Stack spacing={2}>
-      <FilterBar onChange={setFilters} initial={filters} />
+      <FilterBar />
 
       <Grid container spacing={2}>
         <Grid xs={12} sm={6} md={3}>

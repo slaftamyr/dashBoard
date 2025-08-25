@@ -15,21 +15,21 @@ import {
   CartesianGrid,
 } from "recharts";
 import { getSalesTrend, getProducts } from "../services/api.js";
+import { useFilters } from "../context/FiltersContext.jsx";
 
 const PINKS = ["#F1D5E5", "#D09DB6", "#9E9A91", "#C8C3BA"];
 
 export default function Analytics() {
+  const { filters } = useFilters();
   const [trend, setTrend] = useState([]);
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     let mounted = true;
-    getSalesTrend().then((d) => mounted && setTrend(d));
-    getProducts().then((p) => mounted && setProducts(p));
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    getSalesTrend(filters).then((d) => mounted && setTrend(d));
+    getProducts(filters).then((p) => mounted && setProducts(p));
+    return () => { mounted = false; };
+  }, [filters]);
 
   const categoryBreakdown = Object.values(
     products.reduce((acc, p) => {

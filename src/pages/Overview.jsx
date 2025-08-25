@@ -6,9 +6,10 @@ import SalesTrendChart from '../components/SalesTrendChart.jsx';
 import FilterBar from '../components/FilterBar.jsx';
 import StockTable from '../components/StockTable.jsx';
 import { getOverviewMetrics, getSalesTrend, getProducts } from '../services/api.js';
+import { useFilters } from '../context/FiltersContext.jsx';
 
 export default function Overview() {
-  const [filters, setFilters] = useState({ range: '12m', category: 'all', q: '' });
+  const { filters } = useFilters();
   const [metrics, setMetrics] = useState(null);
   const [trend, setTrend] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
@@ -17,13 +18,13 @@ export default function Overview() {
     let mounted = true;
     getOverviewMetrics(filters).then((m) => mounted && setMetrics(m));
     getSalesTrend(filters).then((d) => mounted && setTrend(d));
-    getProducts().then((p) => mounted && setTopProducts(p.slice(0, 5)));
+    getProducts(filters).then((p) => mounted && setTopProducts(p.slice(0, 5)));
     return () => { mounted = false; };
   }, [filters]);
 
   return (
     <Stack spacing={2}>
-      <FilterBar onChange={setFilters} initial={filters} />
+      <FilterBar />
 
       <Grid container spacing={2}>
         <Grid xs={12} sm={6} md={3}>

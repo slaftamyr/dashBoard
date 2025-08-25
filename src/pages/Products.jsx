@@ -12,39 +12,26 @@ import FilterBar from "../components/FilterBar.jsx";
 import StockTable from "../components/StockTable.jsx";
 import StatCard from "../components/StatCard.jsx";
 import { getProducts } from "../services/api.js";
+import { useFilters } from "../context/FiltersContext.jsx";
 
 export default function Products() {
-  const [filters, setFilters] = useState({
-    range: "12m",
-    category: "all",
-    q: "",
-  });
+  const { filters } = useFilters();
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
     let mounted = true;
-    getProducts().then((p) => mounted && setRows(p));
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    getProducts(filters).then((p) => mounted && setRows(p));
+    return () => { mounted = false; };
+  }, [filters]);
 
-  const filtered = useMemo(() => {
-    return rows.filter((r) => {
-      const okCategory =
-        filters.category === "all" || r.category === filters.category;
-      const okQ =
-        !filters.q || r.name.toLowerCase().includes(filters.q.toLowerCase());
-      return okCategory && okQ;
-    });
-  }, [rows, filters]);
+  const filtered = rows;
 
   const totalStock = filtered.reduce((a, b) => a + b.stock, 0);
   const totalSold = filtered.reduce((a, b) => a + b.sold, 0);
 
   return (
     <Stack spacing={2}>
-      <FilterBar onChange={setFilters} initial={filters} />
+      <FilterBar />
 
       <Grid container spacing={2}>
         <Grid xs={12} sm={6} md={3}>

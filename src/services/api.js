@@ -1,13 +1,16 @@
 export function getOverviewMetrics(filters = {}) {
   return new Promise((resolve) => {
     setTimeout(() => {
+      // naive scaling based on range for mock purposes
+      const range = filters.range || '12m';
+      const scale = range === '30d' ? 0.2 : range === '90d' ? 0.5 : 1;
       resolve({
-        totalSales: 12450,
-        revenue: 325000,
-        productsSold: 842,
-        stockLevels: 3120,
-        customers: 1260,
-        repeatBuyers: 420,
+        totalSales: Math.round(12450 * scale),
+        revenue: Math.round(325000 * scale),
+        productsSold: Math.round(842 * scale),
+        stockLevels: 3120, // stock not scaled by range
+        customers: Math.round(1260 * scale),
+        repeatBuyers: Math.round(420 * scale),
       });
     }, 400);
   });
@@ -30,15 +33,17 @@ export function getSalesTrend(filters = {}) {
         { name: "Nov", sales: 350, revenue: 27500 },
         { name: "Dec", sales: 400, revenue: 32000 },
       ];
-      resolve(base);
+      const range = filters.range || '12m';
+      const months = range === '30d' ? 1 : range === '90d' ? 3 : 12;
+      resolve(base.slice(-months));
     }, 400);
   });
 }
 
-export function getProducts() {
+export function getProducts(filters = null) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve([
+      const data = [
         {
           id: "P-1001",
           name: "Industrial Drill",
@@ -79,15 +84,23 @@ export function getProducts() {
           stock: 980,
           sold: 3210,
         },
-      ]);
+      ];
+      if (!filters) return resolve(data);
+      const q = (filters.q || '').toLowerCase();
+      const filtered = data.filter((r) => {
+        const okCat = !filters.category || filters.category === 'all' || r.category === filters.category;
+        const okQ = !q || r.name.toLowerCase().includes(q);
+        return okCat && okQ;
+      });
+      resolve(filtered);
     }, 450);
   });
 }
 
-export function getCustomers() {
+export function getCustomers(filters = null) {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve([
+      const data = [
         {
           id: "C-001",
           name: "Acme Corp",
@@ -123,7 +136,11 @@ export function getCustomers() {
           orders: 1,
           repeat: false,
         },
-      ]);
+      ];
+      if (!filters) return resolve(data);
+      const q = (filters.q || '').toLowerCase();
+      const filtered = data.filter((r) => !q || r.name.toLowerCase().includes(q));
+      resolve(filtered);
     }, 500);
   });
 }

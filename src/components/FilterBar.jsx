@@ -1,5 +1,5 @@
 import { Stack, TextField, MenuItem, Button } from '@mui/material';
-import { useState } from 'react';
+import { useFilters } from '../context/FiltersContext.jsx';
 
 const ranges = [
   { value: '30d', label: 'Last 30 days' },
@@ -7,14 +7,8 @@ const ranges = [
   { value: '12m', label: 'Last 12 months' },
 ];
 
-export default function FilterBar({ onChange, initial = { range: '12m', category: 'all', q: '' } }) {
-  const [filters, setFilters] = useState(initial);
-
-  const update = (patch) => {
-    const next = { ...filters, ...patch };
-    setFilters(next);
-    onChange?.(next);
-  };
+export default function FilterBar() {
+  const { filters, update } = useFilters();
 
   return (
     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 2 }}>
@@ -30,7 +24,7 @@ export default function FilterBar({ onChange, initial = { range: '12m', category
         <MenuItem value="Machinery">Machinery</MenuItem>
       </TextField>
       <TextField size="small" label="Search" value={filters.q} onChange={(e) => update({ q: e.target.value })} placeholder="Find products/customers" sx={{ flex: 1 }} />
-      <Button variant="contained" color="secondary" onClick={() => onChange?.(filters)}>Apply</Button>
+      <Button variant="contained" color="secondary" onClick={() => { /* noop: context already live-updates */ }}>Apply</Button>
     </Stack>
   );
 }
